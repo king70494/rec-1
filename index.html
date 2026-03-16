@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuro Sustentável · Equilíbrio possível?</title>
+    <!-- Fontes e Font Awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(145deg, #f7f9f2 0%, #e2ecd9 100%);
+            color: #1e3a2f;
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            transition: background-color 0.3s ease;
+        }
+
+        /* cores da bandeira do Brasil: verde, amarelo, azul, branco */
+        :root {
+            --verde: #1c6e4f;
+            --verde-claro: #2d8b6b;
+            --amarelo: #f3c74d;
+            --amarelo-suave: #fbdd8c;
+            --azul: #1e4185;
+            --azul-claro: #3a66b4;
+            --branco: #fefefe;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --shadow: 0 20px 30px -10px rgba(20, 60, 30, 0.2);
+        }
+
+        /* container principal */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(3px);
+            border-radius: 3rem 3rem 2rem 2rem;
+            padding: 2.5rem 2rem;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--amarelo);
+        }
+
+        /* cabeçalho com bandeira */
+        .bandeira-bar {
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+        .bandeira-bar span {
+            width: 60px;
+            height: 20px;
+            border-radius: 40px;
+        }
+        .verde-bar { background: var(--verde); }
+        .amarelo-bar { background: var(--amarelo); }
+        .azul-bar { background: var(--azul); }
+        .branco-bar { background: white; border: 1px solid #ccc; }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--verde);
+            text-shadow: 3px 3px 0 var(--amarelo);
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .sub {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--azul);
+            border-left: 8px solid var(--amarelo);
+            padding-left: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        /* abas com animações */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 2.5rem 0 1.8rem;
+            border-bottom: 3px solid var(--amarelo);
+            padding-bottom: 0.3rem;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            border-radius: 40px 40px 0 0;
+            color: var(--azul);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.1, 0.15, 1.2);
+            position: relative;
+            overflow: hidden;
+            background: rgba(255,255,240,0.4);
+            border: 2px solid transparent;
+            letter-spacing: 0.5px;
+        }
+        .tab-btn i {
+            margin-right: 0.6rem;
+            color: var(--verde);
+            transition: transform 0.2s;
+        }
+        .tab-btn:hover {
+            background: var(--amarelo-suave);
+            border: 2px solid var(--verde);
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 8px 0 var(--verde);
+        }
+        .tab-btn:hover i {
+            transform: rotate(10deg) scale(1.2);
+        }
+        .tab-btn.active {
+            background: var(--verde);
+            color: white;
+            border: 2px solid var(--amarelo);
+            box-shadow: 0 8px 0 var(--azul);
+        }
+        .tab-btn.active i {
+            color: var(--amarelo);
+        }
+
+        /* conteúdo das abas com fade + slide */
+        .tab-content {
+            position: relative;
+            min-height: 380px;
+        }
+        .tab-pane {
+            background: var(--bg-card);
+            backdrop-filter: blur(4px);
+            padding: 2rem;
+            border-radius: 40px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.02), 0 10px 20px rgba(0, 60, 30, 0.1);
+            border: 2px solid var(--amarelo);
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .tab-pane.active-pane {
+            display: block;
+            animation: fadeInUp 0.5s forwards;
+        }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* cards e imagens */
+        .img-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        .img-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 2rem;
+            box-shadow: 10px 10px 0 var(--azul-claro);
+            border: 2px solid var(--verde);
+            transition: 0.2s linear;
+            max-width: 280px;
+        }
+        .img-card:hover {
+            transform: scale(1.02) rotate(0.5deg);
+            box-shadow: 15px 15px 0 var(--amarelo);
+        }
+        .img-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 1.2rem;
+            border: 3px solid var(--amarelo);
+        }
+        .img-card figcaption {
+            text-align: center;
+            font-weight: 600;
+            color: var(--azul);
+            margin-top: 0.7rem;
+        }
+
+        .chart-container {
+            background: rgba(255,255,250,0.9);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            border: 3px dashed var(--azul);
+            margin: 2rem 0;
+        }
+
+        .pill {
+            background: var(--amarelo);
+            color: #1e3a2f;
+            padding: 0.3rem 1rem;
+            border-radius: 60px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .fatos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .fato-item {
+            background: white;
+            padding: 1.2rem;
+            border-radius: 1.8rem;
+            border-left: 12px solid var(--verde);
+            transition: all 0.15s;
+            box-shadow: 5px 5px 0 var(--azul-claro);
+        }
+        .fato-item:hover {
+            border-left-color: var(--amarelo);
+            transform: translate(-4px, -4px);
+            box-shadow: 12px 12px 0 var(--azul);
+        }
+
+        .btn-pergunta {
+            background: var(--azul);
+            color: white;
+            border: none;
+            padding: 1rem 2.2rem;
+            border-radius: 60px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: 3px solid var(--amarelo);
+            transition: 0.15s;
+            margin: 1rem 0;
+            cursor: pointer;
+        }
+        .btn-pergunta:hover {
+            background: var(--verde);
+            transform: scale(1.07) rotate(-1deg);
+            box-shadow: 0 10px 0 var(--amarelo);
+        }
+        .resposta-box {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.5rem;
+            font-size: 1.3rem;
+            border: 3px solid var(--amarelo);
+        }
+
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--azul);
+            border-top: 3px solid var(--amarelo);
+            padding-top: 2rem;
+        }
+
+        /* responsivo */
+        @media (max-width:700px){
+            h1{font-size:2rem;}
+            .tabs{flex-direction: column;}
+            .tab-btn{border-radius:60px;}
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- barra bandeira -->
+    <div class="bandeira-bar">
+        <span class="verde-bar"></span>
+        <span class="amarelo-bar"></span>
+        <span class="azul-bar"></span>
+        <span class="branco-bar"></span>
+    </div>
+
+    <h1>🌱 REPENSANDO NOSSAS ATITUDES<br>PARA CONSTRUIR O AMANHÃ</h1>
+    <div class="sub">Futuro Sustentável: o equilíbrio é possível?</div>
+
+    <!-- abas interativas -->
+    <div class="tabs" id="tabHeaders">
+        <button class="tab-btn active" data-tab="tab1"><i class="fas fa-globe-americas"></i> Equilíbrio</button>
+        <button class="tab-btn" data-tab="tab2"><i class="fas fa-temperature-high"></i> Clima em números</button>
+        <button class="tab-btn" data-tab="tab3"><i class="fas fa-recycle"></i> Economia circular</button>
+        <button class="tab-btn" data-tab="tab4"><i class="fas fa-city"></i> Cidades & Ação</button>
+        <button class="tab-btn" data-tab="tab5"><i class="fas fa-comment-dots"></i> Debate</button>
+    </div>
+
+    <!-- conteúdos das abas -->
+    <div class="tab-content">
+        <!-- aba 1 - equilíbrio / conceito -->
+        <div class="tab-pane active-pane" id="tab1">
+            <h2><i class="fas fa-balance-scale" style="color:var(--verde);"></i> Tripé da Sustentabilidade</h2>
+            <div class="img-grid">
+                <figure class="img-card">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 160'%3E%3Crect width='200' height='160' fill='%231c6e4f'/%3E%3Ccircle cx='100' cy='70' r='40' fill='%23f3c74d'/%3E%3Cpath d='M60 130 L140 130 L120 90 L80 90Z' fill='%231e4185'/%3E%3Ctext x='30' y='150' fill='white' font-size='16' font-family='monospace'%3Esocial%3C/text%3E%3C/svg%3E"
+                         alt="tripé">
+                    <figcaption>Social, Ambiental, Econômico</figcaption>
+                </figure>
+                <figure class="img-card">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 160'%3E%3Crect width='200' height='160' fill='%232d8b6b'/%3E%3Ctext x='20' y='80' fill='%23f3c74d' font-size='36' font-weight='bold'%3E1,5🌍%3C/text%3E%3C/svg%3E" alt="superconsumo">
+                    <figcaption>Superconsumo: 1,5 planetas</figcaption>
+                </figure>
+            </div>
+            <p class="pill"><i class="fas fa-seedling"></i> “Capacidade de suprir o presente sem comprometer o futuro”</p>
+            <div class="fatos-grid">
+                <div class="fato-item">🏭 <strong>Perdemos o equilíbrio?</strong> Eventos extremos, IPCC alerta: agir já!</div>
+                <div class="fato-item">⚡ Geração Z: a mais engajada da história — vocês!</div>
+                <div class="fato-item">🔋 <em>Dinamarca</em> já gera 50% da energia eólica.</div>
+            </div>
+        </div>
+
+        <!-- aba 2 - gráfico temperatura / números -->
+        <div class="tab-pane" id="tab2">
+            <h2><i class="fas fa-chart-line" style="color:var(--amarelo);"></i> Aquecimento global em °C</h2>
+            <div class="chart-container">
+                <canvas id="tempChart" width="400" height="200"></canvas>
+            </div>
+            <div class="img-grid">
+                <figure class="img-card">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%231e4185'/%3E%3Ctext x='20' y='70' fill='white' font-size='38'%3E1,2°C%3C/text%3E%3C/svg%3E" alt="1.2°C">
+                    <figcaption>+1,2°C desde era pré-industrial</figcaption>
+                </figure>
+                <figure class="img-card">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23f3c74d'/%3E%3Ctext x='20' y='70' fill='%231e3a2f' font-size='26'%3Eeventos extremos%3C/text%3E%3C/svg%3E" alt="eventos">
+                    <figcaption>Enchentes, secas, ondas de calor</figcaption>
+                </figure>
+            </div>
+            <p><i class="fas fa-robot" style="color:var(--azul);"></i> IA monitora desmatamento (Amazônia) e captura de carbono.</p>
+        </div>
+
+        <!-- aba 3 - economia circular + caminhos -->
+        <div class="tab-pane" id="tab3">
+            <h2>♻️ Economia circular x linear</h2>
+            <div class="img-grid">
+                <figure class="img-card">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23b33f3f'/%3E%3Ctext x='35' y='70' fill='white' font-size='24'%3Eextrair%3C/text%3E%3C/svg%3E" alt="linear">
+                    <figcaption>❌ Linear: extrair, usar, descartar</figcaption>
+                </figure>
+                <figure class="img-card">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%231c6e4f'/%3E%3Ctext x='20' y='70' fill='%23f3c74d' font-size='30'%3E♻️%3C/text%3E%3C/svg%3E" alt="circular">
+                    <figcaption>✅ Circular: reduzir, reusar, reciclar</figcaption>
+                </figure>
+            </div>
+            <p><span class="pill">produtos que duram</span> — repensar, compostar, regenerar.</p>
+            <div class="fato-item"> Energias renováveis: solar, eólica, biomassa (fim dos combustíveis fósseis).</div>
+        </div>
+
+        <!-- aba 4 - cidades sustentáveis e tecnologia -->
+        <div class="tab-pane" id="tab4">
+            <h2><i class="fas fa-tree"></i> Cidades inteligentes (Smart Cities)</h2>
+            <div class="img-grid">
+                <figure class="img-card">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%233a66b4'/%3E%3Ccircle cx='60' cy='40' r='20' fill='%23f3c74d'/%3E%3Cpath d='M100 70 L140 70 L120 110 L80 110Z' fill='%231c6e4f'/%3E%3C/svg%3E" alt="cidade verde">
+                    <figcaption>Ciclovias, telhados verdes</figcaption>
+                </figure>
+                <figure class="img-card">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23f3c74d'/%3E%3Ctext x='40' y='80' fill='%23000' font-size='34'%3EODS%3C/text%3E%3C/svg%3E" alt="ODS">
+                    <figcaption>ODS 7, 11, 13 – metas globais</figcaption>
+                </figure>
+            </div>
+            <ul style="columns:2; margin-top:1rem; background:white; border-radius:40px; padding:1.5rem;">
+                <li><i class="fas fa-bus" style="color:var(--verde);"></i> Mobilidade verde</li>
+                <li><i class="fas fa-wind" style="color:var(--azul);"></i> Energia limpa</li>
+                <li><i class="fas fa-microchip"></i> Agricultura de precisão</li>
+                <li><i class="fas fa-water"></i> Gestão de resíduos</li>
+            </ul>
+        </div>
+
+        <!-- aba 5 - debate / pergunta interativa -->
+        <div class="tab-pane" id="tab5">
+            <h2>💬 O equilíbrio é possível? Debate</h2>
+            <button class="btn-pergunta" id="perguntaBtn"><i class="fas fa-comment"></i> "Você acredita que vamos nos unir a tempo?"</button>
+            <div id="respostaSurpresa" class="resposta-box" style="display:none;">
+                ⚡ <strong>Resposta da turma:</strong> O futuro não é um lugar para onde estamos indo, mas um que estamos criando. Juntos!
+            </div>
+            <div style="margin-top:2rem; background:var(--amarelo-suave); border-radius:40px; padding:1.5rem;">
+                <p><i class="fas fa-exclamation-triangle" style="color:var(--azul);"></i> O maior desafio é comportamental e econômico. Pressionar governos e empresas é tão importante quanto hábitos individuais.</p>
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='70'%3E%3Crect width='200' height='70' fill='%231e4185'/%3E%3Ctext x='15' y='45' fill='%23f3c74d' font-size='24'%3Ecriar juntos%3C/text%3E%3C/svg%3E" style="border-radius:30px;">
+            </div>
+        </div>
+    </div>
+
+    <!-- footer com frase -->
+    <footer>
+        <p>🌿 <em>“O caminho para a sustentabilidade se faz ao caminhar juntos.”</em><br>
+        <span style="color:var(--verde);">#FuturoSustentável  #ODS</span></p>
+    </footer>
+</div>
+
+<script>
+    (function() {
+        // ---- SISTEMA DE ABAS COM ANIMAÇÃO ----
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const panes = document.querySelectorAll('.tab-pane');
+
+        function switchTab(tabId) {
+            // esconde todos os painéis com transição
+            panes.forEach(pane => {
+                pane.classList.remove('active-pane');
+                pane.style.opacity = '0';
+                pane.style.transform = 'translateY(20px)';
+            });
+            // mostra o painel alvo após um pequeno delay para efeito
+            setTimeout(() => {
+                panes.forEach(pane => {
+                    if(pane.id === tabId) {
+                        pane.classList.add('active-pane');
+                        pane.style.opacity = '1';
+                        pane.style.transform = 'translateY(0)';
+                    }
+                });
+            }, 50);
+
+            // atualizar botões ativos
+            tabBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.getAttribute('data-tab') === tabId) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tabId = btn.getAttribute('data-tab');
+                switchTab(tabId);
+            });
+        });
+
+        // ---- GRÁFICO DE AUMENTO DE TEMPERATURA (cores Brasil) ----
+        const ctx = document.getElementById('tempChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Pré-industrial', '1980', '2000', '2015', '2024', '2030 (projeção)'],
+                datasets: [{
+                    label: 'Aumento da temperatura média global (°C)',
+                    data: [0, 0.3, 0.7, 1.0, 1.2, 1.5],
+                    borderColor: '#1e4185',      // azul bandeira
+                    backgroundColor: 'rgba(30, 65, 133, 0.1)',
+                    borderWidth: 5,
+                    pointBackgroundColor: '#f3c74d', // amarelo
+                    pointBorderColor: '#1c6e4f',      // verde
+                    pointRadius: 7,
+                    pointHoverRadius: 12,
+                    tension: 0.2,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { labels: { font: { size: 16, weight: 'bold' }, color: '#1e3a2f' } }
+                },
+                scales: {
+                    y: { beginAtZero: true, title: { display: true, text: '°C (anomalia)', color: '#1c6e4f', font: { weight: 'bold' } } }
+                },
+                hover: { mode: 'index', intersect: false }
+            }
+        });
+
+        // ---- INTERAÇÃO PERGunta SURPRESA (mouse) ----
+        const perguntaBtn = document.getElementById('perguntaBtn');
+        const respostaDiv = document.getElementById('respostaSurpresa');
+        perguntaBtn.addEventListener('mouseenter', () => {
+            respostaDiv.style.display = 'block';
+            respostaDiv.style.opacity = '0';
+            respostaDiv.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                respostaDiv.style.transition = '0.25s';
+                respostaDiv.style.opacity = '1';
+                respostaDiv.style.transform = 'scale(1)';
+            }, 20);
+        });
+        perguntaBtn.addEventListener('mouseleave', () => {
+            respostaDiv.style.opacity = '0';
+            respostaDiv.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                respostaDiv.style.display = 'none';
+            }, 250);
+        });
+        // também ao clicar, exibe como alternativa
+        perguntaBtn.addEventListener('click', () => {
+            respostaDiv.style.display = 'block';
+            respostaDiv.style.opacity = '1';
+            respostaDiv.style.transform = 'scale(1)';
+        });
+
+        // pequeno efeito nos cards imagem (já tem no css)
+
+        // as imagens estão em svg inline simulando as dos slides; compatível com github pages
+    })();
+</script>
+
+<!-- mais algumas animações ao passar mouse nos cards -->
+</body>
+</html>
